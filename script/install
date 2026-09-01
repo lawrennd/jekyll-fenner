@@ -40,14 +40,16 @@ die() {
   exit 1
 }
 
+TARGET=""
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --dry-run) DRY_RUN=1 ;;
-    --symlink) SYMLINK=1 ;;
-    --path1-layouts) PATH1_LAYOUTS=1 ;;
-    --force) FORCE=1 ;;
-    --warn-only) WARN_ONLY=1 ;;
-    --verbose) VERBOSE=1 ;;
+    --dry-run) DRY_RUN=1; shift ;;
+    --symlink) SYMLINK=1; shift ;;
+    --path1-layouts) PATH1_LAYOUTS=1; shift ;;
+    --force) FORCE=1; shift ;;
+    --warn-only) WARN_ONLY=1; shift ;;
+    --verbose) VERBOSE=1; shift ;;
     -h|--help)
       usage
       exit 0
@@ -60,14 +62,14 @@ while [[ $# -gt 0 ]]; do
       die "unknown option: $1"
       ;;
     *)
-      break
+      [[ -z "$TARGET" ]] || die "unexpected extra argument: $1"
+      TARGET="$(cd "$1" && pwd)"
+      shift
       ;;
   esac
-  shift
 done
 
-[[ $# -eq 1 ]] || die "TARGET_THEME_DIR required (see --help)"
-TARGET="$(cd "$1" && pwd)"
+[[ -n "$TARGET" ]] || die "TARGET_THEME_DIR required (see --help)"
 
 [[ -d "$FENNER_ROOT" ]] || die "FENNER_ROOT not found: $FENNER_ROOT"
 [[ -f "$MANIFEST" ]] || die "manifest not found: $MANIFEST"

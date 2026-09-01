@@ -29,6 +29,14 @@ teardown() {
   [ ! -f "$TEST_THEME/.fenner-installed" ]
 }
 
+@test "dry-run accepts flags after target" {
+  header_before="$(cat "$TEST_THEME/_includes/header.html")"
+  run env FENNER_ROOT="$FENNER_ROOT" "$INSTALL" "$TEST_THEME" --dry-run
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"dry-run complete"* ]]
+  [ "$(cat "$TEST_THEME/_includes/header.html")" = "$header_before" ]
+}
+
 @test "install creates manifest files and stamp" {
   run env FENNER_ROOT="$FENNER_ROOT" "$INSTALL" "$TEST_THEME"
   [ "$status" -eq 0 ]
