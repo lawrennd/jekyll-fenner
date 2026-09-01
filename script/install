@@ -1,79 +1,212 @@
 #!/usr/bin/env bash
-# Idempotent install of jekyll-fenner layouts/includes into a target Jekyll theme.
-#
-# Usage:
-#   ./script/install /path/to/jekyll-theme
-#   FENNER_ROOT=/path/to/jekyll-fenner ./script/install .
-#
-# Only Fenner-owned paths are written. Theme chrome is left untouched.
-# Manifest of owned relative paths: script/owned-paths.txt (one path per line).
-
+# Idempotent install of Fenner-owned templates into an org jekyll-theme checkout.
 set -euo pipefail
 
-usage() {
-  cat <<'EOF'
-Usage: script/install TARGET_THEME_DIR
+FENNER_ROOT="${FENNER_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+MANIFEST="${FENNER_MANIFEST:-$FENNER_ROOT/cip/cip0001/fenner-owned-paths.txt}"
+STAMP_NAME=".fenner-installed"
 
-Copy Fenner _layouts and _includes into TARGET_THEME_DIR idempotently.
-Owned paths are listed in script/owned-paths.txt (populated as files are
-extracted into this repo). Until that list exists, this script refuses to
-copy anything so we do not overwrite theme files by accident.
+DRY_RUN=0
+SYMLINK=0
+FORCE=0
+VERBOSE=0
+PATH1_LAYOUTS=0
+WARN_ONLY=0
+
+usage() {
+  cat <<EOF
+Usage: FENNER_ROOT=path $0 [options] TARGET_THEME_DIR
+
+Copy Fenner-owned paths from the manifest into TARGET_THEME_DIR.
+
+Options:
+  --dry-run          List actions without writing files
+  --symlink          Symlink instead of copy (local dev only)
+  --path1-layouts    Overwrite type layouts on path-2 themes
+  --force            Allow unsafe targets (non-git, broad paths)
+  --warn-only        Skip git/_config sanity failures with a warning
+  --verbose          Print each path processed
+  -h, --help         Show this help
+
+Manifest: $MANIFEST
 EOF
 }
 
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
-  usage
+log() { printf '%s\n' "$*"; }
+vlog() { [[ "$VERBOSE" -eq 1 ]] && log "$*"; }
+
+die() {
+  log "error: $*" >&2
+  exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) DRY_RUN=1 ;;
+    --symlink) SYMLINK=1 ;;
+    --path1-layouts) PATH1_LAYOUTS=1 ;;
+    --force) FORCE=1 ;;
+    --warn-only) WARN_ONLY=1 ;;
+    --verbose) VERBOSE=1 ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      die "unknown option: $1"
+      ;;
+    *)
+      break
+      ;;
+  esac
+  shift
+done
+
+[[ $# -eq 1 ]] || die "TARGET_THEME_DIR required (see --help)"
+TARGET="$(cd "$1" && pwd)"
+
+[[ -d "$FENNER_ROOT" ]] || die "FENNER_ROOT not found: $FENNER_ROOT"
+[[ -f "$MANIFEST" ]] || die "manifest not found: $MANIFEST"
+[[ -d "$TARGET" ]] || die "target not a directory: $TARGET"
+
+fenner_real="$(cd "$FENNER_ROOT" && pwd -P)"
+target_real="$(cd "$TARGET" && pwd -P)"
+[[ "$fenner_real" != "$target_real" ]] || die "refusing to install Fenner into itself"
+
+if [[ "$FORCE" -eq 0 ]]; then
+  case "$target_real" in
+    /|"$HOME") die "refusing broad target $target_real (use --force)" ;;
+  esac
+fi
+
+if [[ ! -f "$TARGET/_config.yml" ]]; then
+  if [[ "$WARN_ONLY" -eq 1 ]]; then
+    log "warning: $TARGET/_config.yml missing"
+  else
+    die "$TARGET/_config.yml missing (use --warn-only to override)"
+  fi
+fi
+
+if [[ ! -d "$TARGET/.git" ]]; then
+  if [[ "$WARN_ONLY" -eq 1 ]]; then
+    log "warning: $TARGET is not a git repository"
+  else
+    die "$TARGET is not a git repository (use --warn-only to override)"
+  fi
+fi
+
+is_path2_theme() {
+  local article="$TARGET/_layouts/article.html"
+  [[ -f "$article" ]] || return 1
+  grep -q '^layout:[[:space:]]*default' "$article" && ! grep -q '^layout:[[:space:]]*publication' "$article"
+}
+
+skip_layout=0
+if is_path2_theme && [[ "$PATH1_LAYOUTS" -eq 0 ]]; then
+  skip_layout=1
+  log "path-2 theme detected: skipping _layouts/* (use --path1-layouts to overwrite)"
+fi
+
+fenner_commit="unknown"
+if git -C "$FENNER_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  fenner_commit="$(git -C "$FENNER_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+fi
+
+installed_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+created=0
+updated=0
+skipped=0
+unchanged=0
+paths_installed=()
+
+install_one() {
+  local rel="$1"
+  local src="$FENNER_ROOT/$rel"
+  local dst="$TARGET/$rel"
+
+  [[ -f "$src" ]] || die "Fenner source missing: $src"
+
+  if [[ "$skip_layout" -eq 1 && "$rel" == _layouts/* ]]; then
+    vlog "skip (path-2 layout): $rel"
+    skipped=$((skipped + 1))
+    return
+  fi
+
+  mkdir -p "$(dirname "$dst")"
+
+  if [[ -f "$dst" ]] && cmp -s "$src" "$dst"; then
+    vlog "unchanged: $rel"
+    unchanged=$((unchanged + 1))
+    paths_installed+=("$rel")
+    return
+  fi
+
+  if [[ -f "$dst" ]]; then
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      log "would overwrite: $rel"
+    else
+      vlog "overwrite: $rel"
+    fi
+    updated=$((updated + 1))
+  else
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      log "would create: $rel"
+    else
+      vlog "create: $rel"
+    fi
+    created=$((created + 1))
+  fi
+
+  if [[ "$DRY_RUN" -eq 0 ]]; then
+    if [[ "$SYMLINK" -eq 1 ]]; then
+      ln -sf "$src" "$dst"
+    else
+      /usr/bin/install -m 0644 "$src" "$dst"
+    fi
+  fi
+  paths_installed+=("$rel")
+}
+
+while IFS= read -r line || [[ -n "${line:-}" ]]; do
+  line="${line%%#*}"
+  line="${line#"${line%%[![:space:]]*}"}"
+  line="${line%"${line##*[![:space:]]}"}"
+  [[ -z "$line" ]] && continue
+  install_one "$line"
+done < "$MANIFEST" || true
+
+if [[ "$DRY_RUN" -eq 1 ]]; then
+  log "dry-run complete: would create $created, overwrite $updated, skip $skipped, unchanged $unchanged"
   exit 0
 fi
 
-if [[ $# -ne 1 ]]; then
-  usage >&2
-  exit 2
-fi
+stamp_path="$TARGET/$STAMP_NAME"
+paths_json=""
+for p in "${paths_installed[@]}"; do
+  paths_json+="\"${p//\"/\\\"}\","
+done
+paths_json="[${paths_json%,}]"
 
-TARGET="$(cd "$1" && pwd)"
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-MANIFEST="$ROOT/script/owned-paths.txt"
-
-if [[ ! -d "$TARGET/_layouts" && ! -d "$TARGET/_includes" ]]; then
-  echo "error: $TARGET does not look like a Jekyll theme (no _layouts or _includes)" >&2
-  exit 1
-fi
-
-if [[ ! -f "$MANIFEST" ]]; then
-  cat >&2 <<EOF
-error: $MANIFEST is missing.
-
-Fenner has no extracted templates yet. Add owned relative paths (e.g.
-_layouts/publication.html) to the manifest after the first extract, then
-re-run:
-
-  $0 $TARGET
+cat >"$stamp_path" <<EOF
+{
+  "fenner_commit": "$fenner_commit",
+  "installed_at": "$installed_at",
+  "manifest": "cip/cip0001/fenner-owned-paths.txt",
+  "paths_installed": $paths_json,
+  "created": $created,
+  "updated": $updated,
+  "skipped": $skipped,
+  "unchanged": $unchanged
+}
 EOF
-  exit 1
+
+log "installed Fenner into $TARGET"
+log "  created: $created  updated: $updated  skipped: $skipped  unchanged: $unchanged"
+log "  stamp: $stamp_path (fenner_commit=$fenner_commit)"
+if [[ "$skip_layout" -eq 1 ]]; then
+  log "  note: path-2 theme — type layouts left theme-local; includes updated"
 fi
-
-if [[ ! -s "$MANIFEST" ]]; then
-  echo "error: $MANIFEST is empty; refusing to install" >&2
-  exit 1
-fi
-
-copied=0
-while IFS= read -r rel || [[ -n "$rel" ]]; do
-  [[ -z "$rel" || "$rel" =~ ^# ]] && continue
-  src="$ROOT/$rel"
-  dst="$TARGET/$rel"
-  if [[ ! -e "$src" ]]; then
-    echo "error: owned path missing from Fenner tree: $rel" >&2
-    exit 1
-  fi
-  mkdir -p "$(dirname "$dst")"
-  cp -R "$src" "$dst"
-  echo "installed $rel"
-  copied=$((copied + 1))
-done < "$MANIFEST"
-
-rev="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
-stamp="$TARGET/.jekyll-fenner-revision"
-echo "$rev" > "$stamp"
-echo "Wrote $stamp ($rev); $copied path(s) installed into $TARGET"

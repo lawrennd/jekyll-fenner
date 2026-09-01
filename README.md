@@ -132,23 +132,29 @@ Layout **names** stay stable so existing posts keep `layout: article` /
 
 ## Distribution
 
-Goal: **idempotent reinstall** across theme repos.
-
-Intended flow (to be implemented in `script/install`):
+Install Fenner-owned paths from [`cip/cip0001/fenner-owned-paths.txt`](cip/cip0001/fenner-owned-paths.txt) into an org theme checkout:
 
 ```bash
-# from a theme checkout, e.g. ~/lawrennd/jekyll-theme
+# from a theme checkout, e.g. ~/mlatcl/jekyll-theme
 ../jekyll-fenner/script/install .
 # or
 FENNER_ROOT=~/lawrennd/jekyll-fenner ./script/install /path/to/jekyll-theme
 ```
 
-The installer should:
+**Flags:** `--dry-run`, `--symlink` (local dev), `--path1-layouts` (overwrite type
+layouts on path-2 themes), `--verbose`, `--warn-only`.
 
-1. Copy (or symlink, where appropriate) Fenner `_layouts` / `_includes` into
-   the target theme without touching chrome files.
-2. Be safe to re-run: overwrite only Fenner-owned paths; leave org overrides alone.
-3. Optionally record installed revision (commit SHA) for audit.
+The installer:
+
+1. Copies only manifest paths; never touches `header.html`, `publication.html`
+   chrome, or `_includes/<style>/` skins.
+2. Is safe to re-run: identical files are no-ops; changed Fenner files overwrite.
+3. Writes `.fenner-installed` JSON with Fenner commit SHA and path list.
+4. **Path-2 themes** (e.g. mlresearch): skips `_layouts/*` by default so PMLR
+   keeps `layout: default` wiring; includes still update. See
+   [`cip/cip0001/mlresearch-notes.md`](cip/cip0001/mlresearch-notes.md).
+
+**Tests:** `bats scripts/test/install-test.bats`
 
 Longer term, packaging as a Ruby gem (`jekyll-fenner`) that org themes depend
 on may replace copy-install for repos that can use Bundler (GitHub Pages
@@ -166,10 +172,9 @@ on may replace copy-install for repos that can use Bundler (GitHub Pages
 
 ## Status
 
-CIP-0001 survey complete (2026-09-01): theme matrix, history notes, content
-contracts, and install manifest are in [`cip/cip0001/`](cip/cip0001/). Next:
-extract layouts/includes from `lawrennd/jekyll-theme` per manifest and implement
-`script/install` (CIP-0002).
+- **CIP-0001** survey complete — manifest and notes in [`cip/cip0001/`](cip/cip0001/).
+- **CIP-0002** install script shipped — templates extracted from `lawrennd/jekyll-theme`;
+  run `script/install` into org themes. Pilot builds and rendering checks: CIP-0003.
 
 ## Licence
 
