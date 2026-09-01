@@ -74,24 +74,42 @@ present as in path 1.
 
 ## Scope
 
-### In scope (extract / own here)
+Survey-backed manifest (CIP-0001, 2026-09-01). Full install list:
+[`cip/cip0001/fenner-owned-paths.txt`](cip/cip0001/fenner-owned-paths.txt).
+Reproduce the theme comparison: `python3 scripts/survey_theme_inventory.py`
+→ [`cip/cip0001/survey-matrix.csv`](cip/cip0001/survey-matrix.csv).
 
-- Layouts: `publication` and type aliases used by content
-  (`article`, `inproceedings`, `techreport`, … as wired today)
-- Includes for listing and page body:
-  `listpaper`, `listauthors`, `paper_abstract`,
-  `paper_authors_abstract_links`, …
-- SEO / discovery: `seo-info`, `paper_open_graph_meta`,
-  `paper_twitter_meta`, `paper_google_scholar`, …
-- Cite / export UI: `cite-as`, BibTeX / APA / EndNote / RIS entry + copy
-  sections, `extractinfo_publication`, …
-- CSL export helper: `assets/bib/citeproc.yaml` (where themes still need it
-  vendored)
+### In scope (Fenner-owned; installed from `lawrennd/jekyll-theme`)
 
-### Out of scope (remain in org themes or sites)
+**Type layouts** (path-1 wiring): `article`, `inproceedings`, `techreport`,
+`incollection`, `report`, `addendum`, `dataset`, `data-software`.
 
+**Body includes:** `paper_authors_abstract_links` (canonical rich body),
+`paper_abstract` (path-2 adapter).
+
+**Field extract:** `extractinfo_publication`, `extractname`.
+
+**Listing:** `listpaper`, `listauthors`.
+
+**Cite / export UI:** `cite-as`, `copy_sections`, `copy_buttons`,
+`hidden_copy_code`, BibTeX / APA / EndNote / RIS `*_entry` and
+`*_copy_section` includes.
+
+**SEO / discovery:** `seo-info`, `paper_google_scholar`, `paper_open_graph_meta`,
+`paper_twitter_meta`.
+
+**Bibliography export:** `assets/bib/citeproc.yaml`.
+
+Path-2 themes keep theme-local `_layouts/article.html` (`layout: default`) until
+they opt into path-1 wiring; Fenner does not rename public layout names (see
+[`cip/cip0001/synthesis-decisions.md`](cip/cip0001/synthesis-decisions.md)).
+
+### Out of scope (remain in org themes)
+
+- **`publication.html`** — path-1 chrome differs per org (uk-ai people sidebar,
+  acceleratescience Foundation hero, …)
 - Site chrome: `default`, `home`, `header`, `footer`, nav, logos
-- Brand skins under `_includes/<style>/` (`pmlr`, `mlatcl`, …)
+- Brand skins under `_includes/<style>/` (`pmlr`, `mlatcl`, `delve`, …)
 - Pandoc / grant / talk authoring templates (`lamd`, `publications` `_pandoc`)
 
 ## Planned layout
@@ -107,11 +125,10 @@ jekyll-fenner/
 └── _includes/                     # seo, cite, list*, paper_* fragments
 ```
 
-Exact file lists will be filled by extracting the shared core from
-`lawrennd/jekyll-theme` (canonical source for the rich stack) and reconciling
-with the other path-1 themes, then mapping path-2 `paper_abstract` consumers
-onto the same layouts. Layout **names** stay stable so existing posts keep
-`layout: article` / `inproceedings` / etc.
+Exact file lists come from the CIP-0001 manifest at
+[`cip/cip0001/fenner-owned-paths.txt`](cip/cip0001/fenner-owned-paths.txt).
+Layout **names** stay stable so existing posts keep `layout: article` /
+`inproceedings` / etc.
 
 ## Distribution
 
@@ -149,8 +166,10 @@ on may replace copy-install for repos that can use Bundler (GitHub Pages
 
 ## Status
 
-Bootstrap only: repository scaffolding and documentation. No layouts have been
-copied yet; first extract + install script come next.
+CIP-0001 survey complete (2026-09-01): theme matrix, history notes, content
+contracts, and install manifest are in [`cip/cip0001/`](cip/cip0001/). Next:
+extract layouts/includes from `lawrennd/jekyll-theme` per manifest and implement
+`script/install` (CIP-0002).
 
 ## Licence
 

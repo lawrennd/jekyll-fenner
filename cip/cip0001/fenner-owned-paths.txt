@@ -1,0 +1,66 @@
+# Fenner-owned install paths (CIP-0001 synthesis)
+# Canonical source: lawrennd/jekyll-theme @ main
+# Generated: 2026-09-01
+# Reproduce survey: python3 scripts/survey_theme_inventory.py
+#
+# Path-2 adapter strategy: C (adapters)
+#   - Fenner installs canonical path-1 body + extract + cite + SEO stack.
+#   - path-2 themes keep theme-local `_layouts/article.html` (layout: default)
+#     until migrated; `paper_abstract.html` becomes a thin adapter to shared body.
+#   - Type layout NAMES unchanged (REQ-0002).
+#
+# Lines starting with # are comments. Blank lines ignored by future install script.
+
+# --- Type layouts (path-1 wiring; path-2 themes exempt from article overwrite) ---
+_layouts/article.html
+_layouts/inproceedings.html
+_layouts/techreport.html
+_layouts/incollection.html
+_layouts/report.html
+_layouts/addendum.html
+_layouts/dataset.html
+_layouts/data-software.html
+
+# --- Publication body (path-1 canonical; path-2 adapter) ---
+_includes/paper_authors_abstract_links.html
+_includes/paper_abstract.html
+
+# --- Field extraction (REQ-0003 normalisation boundary) ---
+_includes/extractinfo_publication.html
+_includes/extractname.html
+
+# --- Listing helpers ---
+_includes/listpaper.html
+_includes/listauthors.html
+
+# --- Cite / export UI ---
+_includes/cite-as.html
+_includes/copy_sections.html
+_includes/copy_buttons.html
+_includes/hidden_copy_code.html
+_includes/bibtex_copy_section.html
+_includes/apa_copy_section.html
+_includes/ris_copy_section.html
+_includes/endnote_copy_section.html
+_includes/bibtex_entry
+_includes/apa_entry
+_includes/ris_entry
+_includes/endnote_entry
+
+# --- SEO / discovery ---
+_includes/seo-info.html
+_includes/paper_google_scholar.html
+_includes/paper_open_graph_meta.html
+_includes/paper_twitter_meta.html
+
+# --- Bibliography export helper ---
+assets/bib/citeproc.yaml
+
+# --- Explicitly THEME-LOCAL (not installed by Fenner) ---
+# _layouts/publication.html       path-1 chrome; differs per org
+# _layouts/default.html           site chrome
+# _layouts/home.html              site chrome
+# _includes/header.html           site chrome
+# _includes/footer.html           site chrome
+# _includes/<style>/              branding skins (pmlr, mlatcl, delve, …)
+# _layouts/article.html           on path-2 themes until adapter migration (override)

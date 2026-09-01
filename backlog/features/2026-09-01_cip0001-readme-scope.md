@@ -1,7 +1,7 @@
 ---
 id: "2026-09-01_cip0001-readme-scope"
 title: "CIP-0001: Update README scope from survey manifest"
-status: "Proposed"
+status: "Completed"
 priority: "Medium"
 created: "2026-09-01"
 last_updated: "2026-09-01"
@@ -27,9 +27,9 @@ auditable for theme maintainers.
 
 ## Acceptance Criteria
 
-- [ ] README scope section references the manifest (or embeds its path list).
-- [ ] Chrome vs content boundary matches synthesis decisions (REQ-0001).
-- [ ] No contradiction with CIP-0002 install behaviour once manifest is fixed.
+- [x] README scope section references the manifest (or embeds its path list).
+- [x] Chrome vs content boundary matches synthesis decisions (REQ-0001).
+- [x] No contradiction with CIP-0002 install behaviour once manifest is fixed.
 
 ## Implementation Notes
 
@@ -46,4 +46,4 @@ every path inline unless compression warrants it.
 
 ### 2026-09-01
 
-Task created from CIP-0001 implementation plan step 5.
+Completed. README scope and status sections updated from manifest.

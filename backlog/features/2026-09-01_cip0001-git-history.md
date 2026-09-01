@@ -1,7 +1,7 @@
 ---
 id: "2026-09-01_cip0001-git-history"
 title: "CIP-0001: Git history pass on publication file families"
-status: "Ready"
+status: "Completed"
 priority: "Medium"
 created: "2026-09-01"
 last_updated: "2026-09-01"
@@ -25,11 +25,11 @@ narrative of when cores diverged, not a full blame dump.
 
 ## Acceptance Criteria
 
-- [ ] `cip/cip0001/history-notes.md` documents history for each focus family.
-- [ ] Notes cover: `paper_authors_abstract_links` vs `paper_abstract` introduction,
+- [x] `cip/cip0001/history-notes.md` documents history for each focus family.
+- [x] Notes cover: `paper_authors_abstract_links` vs `paper_abstract` introduction,
       `publication.html` chrome divergence, copy_sections / citeproc.yaml timeline,
       lawrennd vs mlatcl drift status.
-- [ ] Each narrative cites at least one reproducible git command.
+- [x] Each narrative cites at least one reproducible git command.
 
 ## Implementation Notes
 
@@ -48,4 +48,5 @@ Can run in parallel with snapshot inventory; cross-reference matrix once availab
 
 ### 2026-09-01
 
-Task created from CIP-0001 implementation plan step 2.
+Completed. Wrote `cip/cip0001/history-notes.md` from lawrennd, mlatcl, mlresearch
+local git history plus survey cross-checks.

@@ -1,7 +1,7 @@
 ---
 id: "2026-09-01_cip0001-snapshot-inventory"
 title: "CIP-0001: Automate theme snapshot inventory"
-status: "Ready"
+status: "Completed"
 priority: "High"
 created: "2026-09-01"
 last_updated: "2026-09-01"
@@ -29,11 +29,11 @@ for CIP-0002.
 
 ## Acceptance Criteria
 
-- [ ] Script or documented shell recipe can reproduce the inventory from GitHub
+- [x] Script or documented shell recipe can reproduce the inventory from GitHub
       (or fresh local checkouts).
-- [ ] `cip/cip0001/survey-matrix.csv` exists with theme × file × status columns.
-- [ ] All eleven public consumer themes from README are covered.
-- [ ] Reproduction command is cited in task notes or CIP-0001 appendix.
+- [x] `cip/cip0001/survey-matrix.csv` exists with theme × file × status columns.
+- [x] All eleven public consumer themes from README are covered.
+- [x] Reproduction command is cited in task notes or CIP-0001 appendix.
 
 ## Implementation Notes
 
@@ -53,4 +53,5 @@ Prefer default-branch GitHub trees over stale local checkouts where they diverge
 
 ### 2026-09-01
 
-Task created from CIP-0001 implementation plan step 1.
+Completed. Added `scripts/survey_theme_inventory.py`; matrix at
+`cip/cip0001/survey-matrix.csv` (297 rows, eleven themes).

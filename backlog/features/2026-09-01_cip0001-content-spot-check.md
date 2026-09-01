@@ -1,7 +1,7 @@
 ---
 id: "2026-09-01_cip0001-content-spot-check"
 title: "CIP-0001: Live content repo layout contract spot-check"
-status: "Ready"
+status: "Completed"
 priority: "Medium"
 created: "2026-09-01"
 last_updated: "2026-09-01"
@@ -25,11 +25,11 @@ stable layout contracts against live content, not theme templates alone.
 
 ## Acceptance Criteria
 
-- [ ] At least one path-1 content repo sampled (e.g. `lawrennd/publications`).
-- [ ] At least one path-2 content repo sampled (e.g. `mlresearch/v16`).
-- [ ] `cip/cip0001/content-contract-samples.md` lists exemplar front matter per
+- [x] At least one path-1 content repo sampled (e.g. `lawrennd/publications`).
+- [x] At least one path-2 content repo sampled (e.g. `mlresearch/v16`).
+- [x] `cip/cip0001/content-contract-samples.md` lists exemplar front matter per
       layout type with source post references.
-- [ ] Documented legacy alias keys that themes must continue accepting.
+- [x] Documented legacy alias keys that themes must continue accepting.
 
 ## Implementation Notes
 
@@ -47,4 +47,5 @@ normalisation in `extractinfo_publication.html`.
 
 ### 2026-09-01
 
-Task created from CIP-0001 implementation plan step 3.
+Completed. Sampled `lawrennd/publications` and `mlresearch/v16` posts; wrote
+`cip/cip0001/content-contract-samples.md`.

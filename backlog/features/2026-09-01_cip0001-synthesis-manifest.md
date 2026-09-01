@@ -1,7 +1,7 @@
 ---
 id: "2026-09-01_cip0001-synthesis-manifest"
 title: "CIP-0001: Synthesis workshop and Fenner path manifest"
-status: "Proposed"
+status: "Completed"
 priority: "High"
 created: "2026-09-01"
 last_updated: "2026-09-01"
@@ -29,13 +29,13 @@ rules.
 
 ## Acceptance Criteria
 
-- [ ] Each surveyed file classified: Fenner-owned / theme-local / adapter /
+- [x] Each surveyed file classified: Fenner-owned / theme-local / adapter /
       deprecated.
-- [ ] Path-2 unification option (A, B, or C) chosen with rationale (C with
+- [x] Path-2 unification option (A, B, or C) chosen with rationale (C with
       adapters is the CIP recommendation to evaluate).
-- [ ] `cip/cip0001/fenner-owned-paths.txt` written and reviewed — definitive
+- [x] `cip/cip0001/fenner-owned-paths.txt` written and reviewed — definitive
       install manifest for CIP-0002.
-- [ ] Design decisions recorded in CIP-0001 Detailed Description or appendix.
+- [x] Design decisions recorded in CIP-0001 Detailed Description or appendix.
 
 ## Implementation Notes
 
@@ -52,4 +52,4 @@ REQ-0001.
 
 ### 2026-09-01
 
-Task created from CIP-0001 implementation plan step 4.
+Completed. Option C adopted; manifest and `synthesis-decisions.md` written.
