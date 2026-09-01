@@ -8,7 +8,6 @@ review_frequency: "Annual"
 conflicts_with: []
 tags:
   - scope
-  - pandoc
   - authoring
 ---
 
@@ -16,22 +15,22 @@ tags:
 
 **Title**: Presentation, Not Authoring
 
-**Description**: Fenner is Jekyll presentation of already-authored publication pages. Pandoc templates, grant and talk authoring flows, and Markdown-to-paper pipelines belong in packages such as `lamd` and content repos. Mixing authoring and presentation in Fenner would blur ownership and pull unrelated tooling into theme installs.
+**Description**: Fenner renders already-authored publication pages in Jekyll. Authoring pipelines — Pandoc templates, grant skeletons, talk workflows — belong elsewhere. Mixing them into Fenner blurs ownership and pulls unrelated tooling into every theme install.
 
 **Quote**: *"Author elsewhere; present here."*
 
 **Examples**:
-- Keeping Pandoc / `_pandoc` templates out of Fenner’s in-scope file list
-- Assuming posts already carry CiteProc-shaped front matter when Fenner renders them
-- Pointing authors to pandoc for writing workflows and to Fenner for site rendering
+- Authors write in `lamd` or content repos; sites render through Fenner-backed themes
+- Theme installs stay lightweight because they do not ship a full authoring toolchain
+- Presentation fixes do not require republishing author source files
 
 **Counter-examples**:
-- Adding Pandoc reference docs or grant skeletons to the Fenner gem
-- Making Fenner depend on a full authoring toolchain to render a paper page
-- Duplicating `lamd` templates “so themes have everything in one place”
+- Adding Pandoc reference docs to the Fenner gem “for convenience”
+- Making Fenner depend on an authoring stack just to render a paper page
+- Duplicating authoring templates inside Fenner so “themes have everything”
 
 **Conflicts**:
 - Can conflict with desire for a single scholarly toolkit repo
-- Resolution: Compose packages (`lamd` for authoring, Fenner for Jekyll presentation, themes for chrome) rather than collapsing them
+- Resolution: Compose packages (authoring, presentation, chrome) rather than collapsing them
 
-**Version**: 1.0 (2026-09-01)
+**Version**: 1.1 (2026-09-01)
