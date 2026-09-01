@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Idempotent install of jekyll-fenner layouts/includes into a target Jekyll theme.
+#
+# Usage:
+#   ./script/install /path/to/jekyll-theme
+#   FENNER_ROOT=/path/to/jekyll-fenner ./script/install .
+#
+# Only Fenner-owned paths are written. Theme chrome is left untouched.
+# Manifest of owned relative paths: script/owned-paths.txt (one path per line).
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: script/install TARGET_THEME_DIR
+
+Copy Fenner _layouts and _includes into TARGET_THEME_DIR idempotently.
+Owned paths are listed in script/owned-paths.txt (populated as files are
+extracted into this repo). Until that list exists, this script refuses to
+copy anything so we do not overwrite theme files by accident.
+EOF
+}
+
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+if [[ $# -ne 1 ]]; then
+  usage >&2
+  exit 2
+fi
+
+TARGET="$(cd "$1" && pwd)"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+MANIFEST="$ROOT/script/owned-paths.txt"
+
+if [[ ! -d "$TARGET/_layouts" && ! -d "$TARGET/_includes" ]]; then
+  echo "error: $TARGET does not look like a Jekyll theme (no _layouts or _includes)" >&2
+  exit 1
+fi
+
+if [[ ! -f "$MANIFEST" ]]; then
+  cat >&2 <<EOF
+error: $MANIFEST is missing.
+
+Fenner has no extracted templates yet. Add owned relative paths (e.g.
+_layouts/publication.html) to the manifest after the first extract, then
+re-run:
+
+  $0 $TARGET
+EOF
+  exit 1
+fi
+
+if [[ ! -s "$MANIFEST" ]]; then
+  echo "error: $MANIFEST is empty; refusing to install" >&2
+  exit 1
+fi
+
+copied=0
+while IFS= read -r rel || [[ -n "$rel" ]]; do
+  [[ -z "$rel" || "$rel" =~ ^# ]] && continue
+  src="$ROOT/$rel"
+  dst="$TARGET/$rel"
+  if [[ ! -e "$src" ]]; then
+    echo "error: owned path missing from Fenner tree: $rel" >&2
+    exit 1
+  fi
+  mkdir -p "$(dirname "$dst")"
+  cp -R "$src" "$dst"
+  echo "installed $rel"
+  copied=$((copied + 1))
+done < "$MANIFEST"
+
+rev="$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+stamp="$TARGET/.jekyll-fenner-revision"
+echo "$rev" > "$stamp"
+echo "Wrote $stamp ($rev); $copied path(s) installed into $TARGET"

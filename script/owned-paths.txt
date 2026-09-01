@@ -1,0 +1,11 @@
+# Relative paths owned by jekyll-fenner and safe for idempotent install into
+# org themes. One path per line; comments start with #.
+#
+# Populate this list when layouts/includes are first extracted from
+# lawrennd/jekyll-theme (canonical rich publication stack).
+#
+# Examples (not yet extracted):
+# _layouts/publication.html
+# _layouts/article.html
+# _includes/seo-info.html
+# _includes/cite-as.html
