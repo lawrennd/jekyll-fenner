@@ -156,6 +156,13 @@ The installer:
 
 **Tests:** `bats scripts/test/install-test.bats`
 
+**Fixture render (CI primary):** `./scripts/pilot_build_fixture.sh` and
+`./scripts/pilot_build_fixture.sh --path2` — Fenner-owned site under
+`test/fixtures/site/` (CIP-0003). GitHub Actions: `.github/workflows/ci.yml`.
+
+**Path-2 volume smoke (optional, local):** `./scripts/pilot_build_v16.sh` — builds
+`~/mlresearch/v16` against a local `jekyll-theme` checkout.
+
 Longer term, packaging as a Ruby gem (`jekyll-fenner`) that org themes depend
 on may replace copy-install for repos that can use Bundler (GitHub Pages
 `remote_theme` consumers may still need the install step or vendoring).

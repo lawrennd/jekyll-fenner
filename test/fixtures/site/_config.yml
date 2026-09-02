@@ -1,0 +1,29 @@
+# Fenner fixture site (CIP-0003)
+#
+# Minimal Jekyll chrome + golden posts. Fenner-owned layouts/includes are
+# linked in at build time by scripts/pilot_build_fixture.sh — not vendored here.
+#
+# Build:
+#   ./scripts/pilot_build_fixture.sh           # path-1 wiring
+#   ./scripts/pilot_build_fixture.sh --path2   # path-2 wiring
+source: .
+destination: ../../_site/fixture
+title: Fenner Fixture
+url: "http://localhost:4000"
+baseurl: ""
+markdown: kramdown
+permalink: /:title.html
+display:
+  copy_button:
+    bibtex: true
+    endnote: true
+    apa: true
+    ris: true
+plugins:
+  - jekyll-seo-tag
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - path2-layouts
+  - vendor

@@ -1,0 +1,16 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {%- if page.layout == 'article'
+       or page.layout == 'inproceedings'
+       or page.layout == 'techreport'
+       or page.layout == 'report'
+       or page.layout == 'incollection'
+       or page.layout == 'addendum'
+       or page.layout == 'dataset'
+       or page.layout == 'data-software' -%}
+    {%- include seo-info.html -%}
+  {%- else -%}
+    <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+  {%- endif -%}
+</head>
